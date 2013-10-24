@@ -546,6 +546,13 @@ NSDataDetector* sharedReusableDataDetector(NSTextCheckingTypes types)
                 [mutAS setTextColor:self.highlightedTextColor];
                 attributedStringToDisplay = mutAS;
             }
+            if (_activeLink && _highlightedLinkTextColor)
+            {
+                NSMutableAttributedString* mutAS = [attributedStringToDisplay mutableCopy];
+                [mutAS setTextColor:self.highlightedLinkTextColor range:_activeLink.range];
+                attributedStringToDisplay = mutAS;
+            }
+            
             if (textFrame == NULL)
             {
                 CFAttributedStringRef cfAttrStrWithLinks = (__bridge CFAttributedStringRef)attributedStringToDisplay;
@@ -692,6 +699,7 @@ NSDataDetector* sharedReusableDataDetector(NSTextCheckingTypes types)
 @synthesize activeLink = _activeLink;
 @synthesize linkColor = _linkColor;
 @synthesize highlightedLinkColor = _highlightedLinkColor;
+@synthesize highlightedLinkTextColor = _highlightedLinkTextColor;
 @synthesize linkUnderlineStyle = _linkUnderlineStyle;
 @synthesize centerVertically = _centerVertically;
 @synthesize automaticallyAddLinksForType = _automaticallyAddLinksForType;
