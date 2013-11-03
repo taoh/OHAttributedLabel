@@ -598,10 +598,10 @@ NSDataDetector* sharedReusableDataDetector(NSTextCheckingTypes types)
                 // For each line found from where it starts and it's length
                 for(CFIndex idx = 0; idx < lineCount; idx++)
                 {
-                    CTLineRef line = CFArrayGetValueAtIndex((CFArrayRef)lines, idx);
+                    CTLineRef line = CFArrayGetValueAtIndex(lines, idx);
                     
                     CGFloat ascent = self.font.ascender;
-                    CGFloat descent = self.font.descender;
+                    CGFloat descent = -self.font.descender;
                     // Calculate the line height: http://www.cocoanetics.com/2010/02/understanding-uifont/
                     CGFloat y = idx*-(ascent - 1 + descent)-ascent;
                     // Set the correct position for the line
