@@ -531,7 +531,7 @@ NSDataDetector* sharedReusableDataDetector(NSTextCheckingTypes types)
             
             // flipping the context to draw core text
             // no need to flip our typographical bounds from now on
-            CGContextConcatCTM(ctx, CGAffineTransformScale(CGAffineTransformMakeTranslation(0, self.bounds.size.height), 1.f, -1.f));
+            CGContextConcatCTM(ctx, CGAffineTransformScale(CGAffineTransformIdentity, 1.f, -1.f));
             
             if (self.shadowColor)
             {
@@ -588,20 +588,27 @@ NSDataDetector* sharedReusableDataDetector(NSTextCheckingTypes types)
             CGFloat totalHeight = CGRectGetHeight(drawingRect);
             CGContextSetTextMatrix(ctx, CGAffineTransformIdentity);
             CFArrayRef lines = CTFrameGetLines(textFrame);
-            CFIndex numOfLines = CFArrayGetCount(lines);
-            CGPoint lineOrigins[numOfLines];
-            
-            CTFrameGetLineOrigins(textFrame, (CFRange) { 0, numOfLines }, lineOrigins);
-
-            for (CFIndex i = 0; i < numOfLines; i++)
+            if (lines)
             {
-                CGPoint lineOrigin = lineOrigins[i];
-                CTLineRef line = CFArrayGetValueAtIndex(lines, i);
+                CFIndex lineCount = CFArrayGetCount(lines);
+                CGPoint lineOrigins[lineCount];
                 
-                totalHeight -= self.font.leading;
+                CTFrameGetLineOrigins(textFrame, (CFRange) { 0, lineCount }, lineOrigins);
                 
-                CGContextSetTextPosition(ctx, drawingRect.origin.x + lineOrigin.x, drawingRect.origin.y + totalHeight - self.font.descender);
-                CTLineDraw(line, ctx);
+                // For each line found from where it starts and it's length
+                for(CFIndex idx = 0; idx < lineCount; idx++)
+                {
+                    CTLineRef line = CFArrayGetValueAtIndex((CFArrayRef)lines, idx);
+                    
+                    CGFloat ascent = self.font.ascender;
+                    CGFloat descent = self.font.descender;
+                    // Calculate the line height: http://www.cocoanetics.com/2010/02/understanding-uifont/
+                    CGFloat y = idx*-(ascent - 1 + descent)-ascent;
+                    // Set the correct position for the line
+                    CGContextSetTextPosition(ctx, 0.0, y);
+                    
+                    CTLineDraw(line, ctx);
+                }
             }
             
             //CTFrameDraw(textFrame, ctx);
