@@ -585,7 +585,26 @@ NSDataDetector* sharedReusableDataDetector(NSTextCheckingTypes types)
                 [self drawActiveLinkHighlightForRect:drawingRect];
             }
             
-            CTFrameDraw(textFrame, ctx);
+            CGFloat totalHeight = CGRectGetHeight(drawingRect);
+            CGContextSetTextMatrix(ctx, CGAffineTransformIdentity);
+            CFArrayRef lines = CTFrameGetLines(textFrame);
+            CFIndex numOfLines = CFArrayGetCount(lines);
+            CGPoint lineOrigins[numOfLines];
+            
+            CTFrameGetLineOrigins(textFrame, (CFRange) { 0, numOfLines }, lineOrigins);
+
+            for (CFIndex i = 0; i < numOfLines; i++)
+            {
+                CGPoint lineOrigin = lineOrigins[i];
+                CTLineRef line = CFArrayGetValueAtIndex(lines, i);
+                
+                totalHeight -= self.font.leading;
+                
+                CGContextSetTextPosition(ctx, drawingRect.origin.x + lineOrigin.x, drawingRect.origin.y + totalHeight - self.font.descender);
+                CTLineDraw(line, ctx);
+            }
+            
+            //CTFrameDraw(textFrame, ctx);
             
             CGContextRestoreGState(ctx);
         } // @autoreleasepool
