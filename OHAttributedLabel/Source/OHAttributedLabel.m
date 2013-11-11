@@ -385,16 +385,22 @@ NSDataDetector* sharedReusableDataDetector(NSTextCheckingTypes types)
 	CGPoint origins[nbLines];
 	CTFrameGetLineOrigins(textFrame, CFRangeMake(0,0), origins);
 	
+    CGFloat ascent = self.font.ascender;
+    CGFloat descent = -self.font.descender;
+    CGFloat lineHeight = ascent - 1 + descent;
 	for (int lineIndex=0 ; lineIndex<nbLines ; ++lineIndex)
     {
+        // Calculate the line height: http://www.cocoanetics.com/2010/02/understanding-uifont/
+        CGFloat y = lineIndex*lineHeight;
+        CGRect lineRect = CGRectMake(0, y, drawingRect.size.width, lineHeight);
 		// this actually the origin of the line rect, so we need the whole rect to flip it
-		CGPoint lineOriginFlipped = origins[lineIndex];
-		
+        //		CGPoint lineOriginFlipped = CGPointMake(0, -y); //origins[lineIndex];
+        //
 		CTLineRef line = CFArrayGetValueAtIndex(lines, lineIndex);
-		CGRect lineRectFlipped = CTLineGetTypographicBoundsAsRect(line, lineOriginFlipped);
-		CGRect lineRect = CGRectFlipped(lineRectFlipped, CGRectFlipped(drawingRect,self.bounds));
-		
-		lineRect = CGRectInset(lineRect, 0, -kVMargin);
+        //		CGRect lineRectFlipped = CTLineGetTypographicBoundsAsRect(line, lineOriginFlipped);
+        //		CGRect lineRect = CGRectFlipped(lineRectFlipped, CGRectFlipped(drawingRect,self.bounds));
+        //
+        //		lineRect = CGRectInset(lineRect, 0, -kVMargin);
 		if (CGRectContainsPoint(lineRect, point))
         {
 			CGPoint relativePoint = CGPointMake(point.x-CGRectGetMinX(lineRect),
