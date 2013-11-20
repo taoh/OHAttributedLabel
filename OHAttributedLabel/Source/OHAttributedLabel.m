@@ -555,7 +555,7 @@ NSDataDetector* sharedReusableDataDetector(NSTextCheckingTypes types)
             if (_activeLink && _highlightedLinkTextColor)
             {
                 NSMutableAttributedString* mutAS = [attributedStringToDisplay mutableCopy];
-                [mutAS setTextColor:self.highlightedLinkTextColor range:_activeLink.range];
+                [mutAS setTextColor:self.highlightedLinkTextColor range:NSIntersectionRange(_activeLink.range, NSMakeRange(0, mutAS.length))];
                 attributedStringToDisplay = mutAS;
             }
             
